@@ -19,6 +19,12 @@ const INIT_RESULT: {
 };
 
 export const Calculator = () => {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
+
   const [vector1, setVector1] = useState([...INIT_VECTOR]);
   const [vector2, setVector2] = useState([...INIT_VECTOR]);
 
@@ -29,6 +35,60 @@ export const Calculator = () => {
   const isDisabled = useMemo(() => {
     return vector1.concat(vector2).some(value => value === null);
   }, [vector1, vector2]);
+
+  // // Функція onCalculateValue обчислює три різні норми (Евклідову, міську та Чебишова)
+  // // для переданого вектора vectorValue.
+  // const onCalculateValue = useCallback((vectorValue: number[]) => {
+  //   // Евклідова норма (довжина вектора) — це квадратний корінь із суми квадратів його компонентів.
+  //   const evklid = Math.sqrt(vectorValue.reduce((sum, value) => sum + Math.pow(value, 2), 0));
+
+  //   // Міська (таксична) норма — це сума модулів всіх компонентів вектора.
+  //   const city = vectorValue.reduce((sum, value) => sum + Math.abs(value), 0);
+
+  //   // Норма Чебишова — це найбільший модуль серед компонентів вектора.
+  //   const cheb = Math.max(...vectorValue.map(value => Math.abs(value)));
+
+  //   // Функція повертає обчислені норми з точністю до чотирьох знаків після коми.
+  //   return {
+  //     evklid: parseFloat(evklid.toFixed(4)),
+  //     city:  parseFloat(city.toFixed(4)),
+  //     cheb:  parseFloat(cheb.toFixed(4)),
+  //   };
+  // }, []);
+
+
+  // // Функція onCalculateResult обчислює різницю між двома векторами vector1 і vector2 
+  // // і знаходить їхню норму, використовуючи onCalculateValue.
+  // const onCalculateResult = useCallback(() => {
+  //   // Створюємо новий масив нульових значень з довжиною COUNT
+  //   const vectorValue: number[] = new Array(COUNT).fill(0);
+
+  //   // Обчислюємо різницю між відповідними елементами vector1 та vector2
+  //   for (let index = 0; index < COUNT; index++) {
+  //     vectorValue[index] = vector1[index] - vector2[index];
+  //   }
+
+  //   // Обчислюємо норми для отриманого вектора-різниці
+  //   const resultValue = onCalculateValue(vectorValue);
+
+  //   // Зберігаємо результат у стані
+  //   setResult({ ...resultValue });
+  // }, [isDisabled, vector1, vector2, setResult]);
+
+
+  // // Функція onCalculateNorm обчислює норми окремо для векторів vector1 та vector2.
+  // const onCalculateNorm = useCallback(() => {
+  //   // Обчислюємо норми для vector1
+  //   const normV1Value = onCalculateValue(vector1);
+
+  //   // Обчислюємо норми для vector2
+  //   const normV2Value = onCalculateValue(vector2);
+
+  //   // Зберігаємо результати у стані
+  //   setNormV1({...normV1Value});
+  //   setNormV2({...normV2Value});
+  // }, [isDisabled, vector1, vector2, setResult]);
+
 
   const onCalculateValue = useCallback((vectorValue: number[]) => {
     const evklid = Math.sqrt(vectorValue.reduce((sum, value) => sum + Math.pow(value, 2), 0));
@@ -87,19 +147,38 @@ export const Calculator = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 p-8">
+      <div className={`flex items-center justify-center min-h-screen p-8 ${
+        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
+      }`}>
         <div className="grid grid-cols-1 gap-[12px]">
-          <div className="w-[596px] gap-[16px] mb-4 flex items-start justify-between">
-            <p className="text-white/80">Калькулятор норм та метрик</p>
-            <p className="text-white/80 text-right">розробив Денисенко І.О.<br/>гр.Б-121-22-1-ПІ</p>
+          <div className="w-[596px] gap-[16px] mb-2 flex items-start justify-between">
+            <p className={isDarkMode ? "text-white/80" : "text-gray-800"}>Калькулятор норм та метрик</p>
+            <p className={isDarkMode ? "text-white/80 text-right" : "text-gray-800 text-right"}>
+              розробив Денисенко І.О.<br />гр.Б-121-22-1-ПІ
+            </p>
+          </div>
+          {/* Переключатель темы */}
+          <div className="w-[596px] flex mb-2 justify-end">
+            <button
+              className={`py-1 px-3 border rounded ${
+                isDarkMode
+                  ? "bg-gray-800 text-white border-gray-600 hover:bg-gray-700"
+                  : "bg-gray-300 text-black border-gray-400 hover:bg-gray-400"
+              }`}
+              onClick={toggleTheme}
+            >
+              {isDarkMode ? "Світла тема" : "Темна тема"}
+            </button>
           </div>
           <CalculatorVector
+            isDarkMode={isDarkMode}
             title="Vector 1"
             prefix="x"
             vector={vector1}
             setVector={setVector1}
           />
           <CalculatorVector
+            isDarkMode={isDarkMode}
             title="Vector 2"
             prefix="y"
             vector={vector2}
@@ -108,9 +187,9 @@ export const Calculator = () => {
           <div className="flex items-center gap-[16px] justify-start">
             <div className="w-[96px]" />
             <div className="flex gap-[8px]">
-              <h3 className="w-[156px] text-lg text-white/80">розмір V1</h3>
-              <h3 className="w-[156px] text-lg text-white/80">відстань V2-V1</h3>
-              <h3 className="w-[156px] text-lg text-white/80">розмір V2</h3>
+              <h3 className={`w-[156px] text-lg ${isDarkMode ? 'text-white/80' : 'text-gray-800'}`}>розмір V1</h3>
+              <h3 className={`w-[156px] text-lg ${isDarkMode ? 'text-white/80' : 'text-gray-800'}`}>відстань V2-V1</h3>
+              <h3 className={`w-[156px] text-lg ${isDarkMode ? 'text-white/80' : 'text-gray-800'}`}>розмір V2</h3>
             </div>
           </div>
           <CalculatorMetric
@@ -133,7 +212,11 @@ export const Calculator = () => {
           />
           <section className="w-[596px] flex items-center gap-[8px] justify-end">
             <button
-              className="w-[156px] bg-gray-800 hover:bg-gray-700 text-white/90 py-2 px-2 border border-gray-600"
+              className={`w-[156px] py-2 px-2 border ${
+                isDarkMode
+                  ? "bg-gray-800 hover:bg-gray-700 text-white/90 border-gray-600"
+                  : "bg-gray-300 hover:bg-gray-400 text-black border-gray-400"
+              }`}
               onClick={onClear}
             >
               Clear
